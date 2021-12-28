@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <!-- BootStrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+  <link rel="stylesheet" href="./main.css">
+</head>
+<body class="bg-warning bg-opacity-25">
+  
+  <nav class="navbar navbar-expand-lg navbar-light bg-warning">
+    <div class="container-fluid">
+      <a class="navbar-brand text-danger fw-bold" href="#">Carrot Market</a>
+      <span class="ms-auto mx-2 text-danger fw-bold" id="userName"></span>
+      <button class="navbar-toggler bg-danger bg-opacity-50" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link text-danger" href="/index.html">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-danger" href="/upload.html">Upload</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-danger" href="/chat.html">Chat</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link text-danger" id="sign"></a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <div class="container mt-3"></div>
+
+  <div class="footer bg-warning">
+    <footer class="py-3 my-4 mb-0">
+      <ul class="nav justify-content-center border-bottom pb-3 mb-3">
+        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">Home</a></li>
+        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">Features</a></li>
+        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">FAQs</a></li>
+        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">About</a></li>
+      </ul>
+      <p class="text-center text-danger">&copy; 2021 Carrot Market, Inc</p>
+    </footer>
+  </div>
+
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.5/firebase-storage.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyB0o4lcp2rx3FWi9YeZHKX1V0SzdjqMcTI",
+      authDomain: "carrot-market-38d3c.firebaseapp.com",
+      projectId: "carrot-market-38d3c",
+      storageBucket: "carrot-market-38d3c.appspot.com",
+      messagingSenderId: "368284857452",
+      appId: "1:368284857452:web:7286019c773093c9139449"
+    };
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+  </script>
+  <!-- BootStrap -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+  <!-- JQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+  <script>
+    const db = firebase.firestore();
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        $('#userName').html('Welcome, ' + user.displayName);
+        $('#sign').html('Sign Out');
+        $('#sign').click(function() {
+          auth.signOut().then(() => {
+            localStorage.removeItem('user');
+            console.log('Signed Out Successfully!');
+            location.reload();
+            alert("Signed Out Successfully!");
+          }).catch((error) => {
+            console.log(error);
+          })
+        })
+      } else {
+        $('#userName').hide();
+        $('#sign').html('Sign In');
+        $('#sign').click(function() {
+          window.location.href = '/login.html';
+        })
+      }
+    })
+
+    db.collection('product').get().then((snapshot) => {
+      snapshot.forEach((doc) => {
+        var template = `
+          <div class="product bg-warning bg-opacity-50">
+            <div class="thumbnail" style="background-image: url(${doc.data().image})"></div>
+            <div class="flex-grow-1 p-4">
+              <h5 class="title"><a href="/detail.html?id=${doc.id}">${doc.data().title}</a></h5>
+              <p class="date">${doc.data().date}</p>
+              <p class="price">$${doc.data().price}</p>
+              <p class="float-end text-danger">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-bag-fill" viewBox="0 0 16 16"><path d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1zm3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4h-3.5z"/></svg>
+              </p>
+            </div>
+          </div>
+        `;
+        $('.container').append(template);
+      })
+      
+    })
+  </script>
+</body>
+</html>
