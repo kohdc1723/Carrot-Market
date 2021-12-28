@@ -38,6 +38,7 @@
   </nav>
 
   <div class="container p-4 detail">
+    <div class="chatroom-profile text-danger fs-4 fw-bold m-2"></div>
     <div class="row">
       <div class="col-3 p-0">
         <ul class="list-group chat-list"></ul>
@@ -94,6 +95,31 @@
   <script>
     const db = firebase.firestore();
     const storage = firebase.storage();
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        $('#userName').html('Welcome, ' + user.displayName);
+        $('#sign').html('Sign Out');
+        $('.chatroom-profile').html(`${user.displayName}'s chatroom`);
+        $('#sign').click(function() {
+          auth.signOut().then(() => {
+            localStorage.removeItem('user');
+            console.log('Signed Out Successfully!');
+            location.reload();
+            alert("Signed Out Successfully!");
+          }).catch((error) => {
+            console.log(error);
+          })
+        })
+      } else {
+        $('#userName').hide();
+        $('#sign').html('Sign In');
+        $('#sign').click(function() {
+          window.location.href = '/login.html';
+        })
+      }
+    })
 
     var uid = JSON.parse(localStorage.getItem('user')).uid;
     var chatroomID;
@@ -131,7 +157,6 @@
                 $('.chat-content').append(your);
               }
               
-              
             })
           })
         })
@@ -146,7 +171,9 @@
         date: date,
         uid: uid
       }
-      db.collection('chatroom').doc(chatroomID).collection('messages').add(data);
+      db.collection('chatroom').doc(chatroomID).collection('messages').add(data).then(() => {
+        $('#chat-input').val('');
+      })
     })
     
   </script>

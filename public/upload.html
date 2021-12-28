@@ -40,7 +40,7 @@
     </div>
   </nav>
 
-  <div class="upload-container mt-3 mb-6">
+  <div class="container mt-3 mb-6">
     <input type="text" class="form-control mt-2" id="title" placeholder="title">
     <textarea class="form-control mt-2" id="content" placeholder="content"></textarea>
     <input type="text" class="form-control mt-2" id="price" placeholder="price">
@@ -89,6 +89,29 @@
     const db = firebase.firestore();
     const storage = firebase.storage();
     const auth = firebase.auth();
+
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        $('#userName').html('Welcome, ' + user.displayName);
+        $('#sign').html('Sign Out');
+        $('#sign').click(function() {
+          auth.signOut().then(() => {
+            localStorage.removeItem('user');
+            console.log('Signed Out Successfully!');
+            location.reload();
+            alert("Signed Out Successfully!");
+          }).catch((error) => {
+            console.log(error);
+          })
+        })
+      } else {
+        $('#userName').hide();
+        $('#sign').html('Sign In');
+        $('#sign').click(function() {
+          window.location.href = '/login.html';
+        })
+      }
+    })
 
     $('#send').click(function() {
       firebase.auth().onAuthStateChanged((user) => {

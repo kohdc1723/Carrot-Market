@@ -107,17 +107,46 @@
       uidSeller = result.data().uid;
       productName = result.data().title;
 
+      // authentication function
       auth.onAuthStateChanged((user) => {
+        // if user signed in,
         if (user) {
+          // display username in nav bar
+          $('#userName').html('Welcome, ' + user.displayName);
+          // populate sign out button
+          $('#sign').html('Sign Out');
+          // click => sign out function
+          $('#sign').click(function() {
+            auth.signOut().then(() => {
+              localStorage.removeItem('user');
+              console.log('Signed Out Successfully!');
+              location.reload();
+              alert("Signed Out Successfully!");
+            }).catch((error) => {
+              console.log(error);
+            })
+          })
+          // if uploader == user signed in
           if (user.uid == uidSeller) {
+            // show edit button
             console.log(uidSeller);
             $('#chat').hide();
+          // if uploader != user signed in
           } else {
+            // show chat button
             console.log(uidSeller);
             $('#edit').hide();
           }
+        // if user is not signed in,
         } else {
-
+          // hide display name
+          $('#userName').hide();
+          // show sign in button
+          $('#sign').html('Sign In');
+          // click sign in button => login.html
+          $('#sign').click(function() {
+            window.location.href = '/login.html';
+          })
         }
       })
     })
@@ -144,20 +173,28 @@
       db.collection('chatroom').get().then((result) => {
         result.forEach((snapshot) => {
           console.log(snapshot.data());
+          // check if the chatroom already exists
           if (snapshot.data().product == productName
-            && snapshot.data().participants.includes(uidBuyer)) {
+            && snapshot.data().participants.includes(uidBuyer)
+            && snapshot.data().participants.includes(uidSeller)) {
             exist = true;
+          }
+
+          // if the chatroom already exists,
+          if (exist) {
+            // redirect to chat.html
+            window.location.href = '/chat.html';
+          // if the chatroom doesn't exist.
+          } else {
+            // create the chatroom and redirect to chat.html
+            db.collection('chatroom').add(chatData).then(() => {
+              window.location.href = '/chat.html';
+            });
           }
         })
       })
       
-      if (exist) {
-        window.location.href = '/chat.html';
-      } else {
-        db.collection('chatroom').add(chatData).then(() => {
-          window.location.href = '/chat.html';
-        });
-      }
+      
 
       
     })

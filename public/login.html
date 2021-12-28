@@ -38,6 +38,7 @@
   </nav>
 
   <div class="container mt-3">
+    <div class="text-danger fw-bold fs-4 m-2">Sign Up</div>
     <div class="mb-3">
       <input type="text" class="form-control" placeholder="name" id="name-new">
     </div>
@@ -47,18 +48,19 @@
     <div class="mb-3">
       <input type="password" class="form-control" placeholder="password" id="pw-new">
     </div>
-    <button type="submit" class="btn btn-primary" id="register">Sign Up</button>
+    <button type="submit" class="btn btn-danger" id="register">Sign Up</button>
   </div>
 
+  <br>
   <div class="container mt-3">
+    <div class="text-danger fw-bold fs-4 m-2">Sign In</div>
     <div class="mb-3">
       <input type="email" class="form-control" placeholder="email" id="email">
     </div>
     <div class="mb-3">
       <input type="password" class="form-control" placeholder="password" id="pw">
     </div>
-    <button type="submit" class="btn btn-primary" id="login">Sign In</button>
-    <button type="submit" class="btn btn-primary" id="logout">Sign Out</button>
+    <button type="submit" class="btn btn-danger" id="login">Sign In</button>
   </div>
 
   <div class="footer bg-warning">
@@ -106,6 +108,24 @@
       if (user) {
         console.log(user.displayName);
         localStorage.setItem('user', JSON.stringify(user));
+        $('#userName').html('Welcome, ' + user.displayName);
+        $('#sign').html('Sign Out');
+        $('#sign').click(function() {
+          auth.signOut().then(() => {
+            localStorage.removeItem('user');
+            console.log('Signed Out Successfully!');
+            location.reload();
+            alert("Signed Out Successfully!");
+          }).catch((error) => {
+            console.log(error);
+          })
+        })
+      } else {
+        $('#userName').hide();
+        $('#sign').html('Sign In');
+        $('#sign').click(function() {
+          window.location.href = '/login.html';
+        })
       }
     })
 
