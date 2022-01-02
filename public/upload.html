@@ -27,37 +27,26 @@
             <a class="nav-link text-danger" href="/index.html">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-danger" href="/upload.html">Upload</a>
+            <a class="nav-link text-danger" id="upload-button" href="#">Upload</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-danger" href="/chat.html">Chat</a>
+            <a class="nav-link text-danger" id="chat-button" href="#">Chat</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-danger" id="sign"></a>
+            <a class="nav-link text-danger" id="sign" href="#"></a>
           </li>
         </ul>
       </div>
     </div>
   </nav>
 
-  <div class="container mt-3 mb-6">
+  <div class="container" id="upload-container">
+    <div class="text-danger fw-bold fs-4">Upload Item</div>
     <input type="text" class="form-control mt-2" id="title" placeholder="title">
     <textarea class="form-control mt-2" id="content" placeholder="content"></textarea>
     <input type="text" class="form-control mt-2" id="price" placeholder="price">
     <input class="form-control mt-2" type="file" id="image">
     <button class="btn btn-danger mt-3" id="send">Upload</button>
-  </div>
-
-  <div class="footer bg-warning">
-    <footer class="py-3 my-4 mb-0">
-      <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">Home</a></li>
-        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">Features</a></li>
-        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">FAQs</a></li>
-        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">About</a></li>
-      </ul>
-      <p class="text-center text-danger">&copy; 2021 Carrot Market, Inc</p>
-    </footer>
   </div>
 
   <!-- Firebase -->
@@ -104,10 +93,24 @@
             console.log(error);
           })
         })
+        $('#chat-button').click(function() {
+          window.location.href = '/chat.html';
+        })
+        $('#upload-button').click(function() {
+          window.location.href = '/upload.html';
+        })
       } else {
         $('#userName').hide();
         $('#sign').html('Sign In');
         $('#sign').click(function() {
+          window.location.href = '/login.html';
+        })
+        $('#chat-button').click(function() {
+          alert('Sign In Before Chat!');
+          window.location.href = '/login.html';
+        })
+        $('#upload-button').click(function() {
+          alert('Sign In Before Upload!');
           window.location.href = '/login.html';
         })
       }

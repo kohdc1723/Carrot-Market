@@ -22,6 +22,9 @@
   color: grey;
   font-size: 13px;
 }
+#body {
+  min-height: 1000px;
+}
 
 /* detail.html style */
 .detail-pic {

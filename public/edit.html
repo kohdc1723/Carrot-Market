@@ -27,13 +27,13 @@
             <a class="nav-link text-danger" href="/index.html">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-danger" href="/upload.html">Upload</a>
+            <a class="nav-link text-danger" id="upload-button" href="#">Upload</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-danger" href="/chat.html">Chat</a>
+            <a class="nav-link text-danger" id="chat-button" href="#">Chat</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-danger" id="sign"></a>
+            <a class="nav-link text-danger" id="sign" href="#"></a>
           </li>
         </ul>
       </div>
@@ -41,23 +41,11 @@
   </nav>
 
   <div class="container mt-3">
-    <span>Edit Page</span>
+    <div class="text-danger fw-bold fs-4">Edit Page</div>
     <input type="text" class="form-control mt-2" id="title" placeholder="title">
     <textarea class="form-control mt-2" id="content" placeholder="content"></textarea>
     <input type="text" class="form-control mt-2" id="price" placeholder="price">
     <button class="btn btn-danger mt-3" id="edit">Edit</button>
-  </div>
-
-  <div class="footer bg-warning">
-    <footer class="py-3 my-4 mb-0">
-      <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">Home</a></li>
-        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">Features</a></li>
-        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">FAQs</a></li>
-        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">About</a></li>
-      </ul>
-      <p class="text-center text-danger">&copy; 2021 Carrot Market, Inc</p>
-    </footer>
   </div>
 
   <!-- Firebase -->
@@ -88,6 +76,44 @@
   <script>
     const db = firebase.firestore();
     const storage = firebase.storage();
+    const auth = firebase.auth();
+
+    auth.onAuthStateChanged((user) => {
+      if (user) {
+        $('#userName').html('Welcome, ' + user.displayName);
+        $('#sign').html('Sign Out');
+        $('#sign').click(function() {
+          auth.signOut().then(() => {
+            localStorage.removeItem('user');
+            console.log('Signed Out Successfully!');
+            location.reload();
+            alert("Signed Out Successfully!");
+          }).catch((error) => {
+            console.log(error);
+          })
+        })
+        $('#chat-button').click(function() {
+          window.location.href = '/chat.html';
+        })
+        $('#upload-button').click(function() {
+          window.location.href = '/upload.html';
+        })
+      } else {
+        $('#userName').hide();
+        $('#sign').html('Sign In');
+        $('#sign').click(function() {
+          window.location.href = '/login.html';
+        })
+        $('#chat-button').click(function() {
+          alert('Sign In Before Chat!');
+          window.location.href = '/login.html';
+        })
+        $('#upload-button').click(function() {
+          alert('Sign In Before Upload!');
+          window.location.href = '/login.html';
+        })
+      }
+    })
 
     var querystring = new URLSearchParams(window.location.search);
     var id = querystring.get('id');
@@ -104,7 +130,9 @@
         content: $('#content').val(),
         price: $('#price').val()
       };
-      db.collection('product').doc(id).update(update);
+      db.collection('product').doc(id).update(update).then(() => {
+        window.location.href = `/detail.html?id=${id}`;
+      });
     })
 
   </script>

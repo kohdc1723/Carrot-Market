@@ -24,13 +24,13 @@
             <a class="nav-link text-danger" href="/index.html">Home</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-danger" href="/upload.html">Upload</a>
+            <a class="nav-link text-danger" id="upload-button" href="#">Upload</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-danger" href="/chat.html">Chat</a>
+            <a class="nav-link text-danger" id="chat-button" href="#">Chat</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link text-danger" id="sign"></a>
+            <a class="nav-link text-danger" id="sign" href="#"></a>
           </li>
         </ul>
       </div>
@@ -38,29 +38,16 @@
   </nav>
 
   <div class="container">
-    <span>Detail Page</span>
     <div class="detail-pic my-4" style="background-image: url('https://placeimg.com/640/380/tech');"></div>
     <div>
-      <h5 class="uploader">Uploader</h5>
+      <h5 class="uploader text-danger fw-bold fs-4">Uploader</h5>
       <hr>
-      <h5 class="title">Title</h5>
-      <p class="date">Date</p>
-      <p class="price">Price</p>
-      <button class="btn btn-outline-secondary" id="edit">Edit</button>
-      <button class="btn btn-outline-secondary" id="chat">Chat</button>
+      <h5 class="title text-danger fw-bold fs-4">Title</h5>
+      <p class="date text-danger fs-5">Date</p>
+      <p class="price text-danger fs-5">Price</p>
+      <button class="btn btn-outline-danger" id="edit">Edit</button>
+      <button class="btn btn-outline-danger" id="chat">Chat</button>
     </div>
-  </div>
-
-  <div class="footer bg-warning">
-    <footer class="py-3 my-4 mb-0">
-      <ul class="nav justify-content-center border-bottom pb-3 mb-3">
-        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">Home</a></li>
-        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">Features</a></li>
-        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">FAQs</a></li>
-        <li class="nav-item"><a href="#" class="nav-link px-2 text-danger">About</a></li>
-      </ul>
-      <p class="text-center text-danger">&copy; 2021 Carrot Market, Inc</p>
-    </footer>
   </div>
 
   <!-- Firebase -->
@@ -93,6 +80,7 @@
     var querystring = new URLSearchParams(window.location.search);
     var id = querystring.get('id');
     var uidSeller; // for the chatData
+    var sellerName; // for the chatData
     var productName; // for the chatData
     db.collection('product').doc(id).get().then((result) => {
       console.log(result);
@@ -106,6 +94,7 @@
       // for the chatData
       uidSeller = result.data().uid;
       productName = result.data().title;
+      sellerName = result.data().name;
 
       // authentication function
       auth.onAuthStateChanged((user) => {
@@ -125,6 +114,12 @@
             }).catch((error) => {
               console.log(error);
             })
+          })
+          $('#chat-button').click(function() {
+            window.location.href = '/chat.html';
+          })
+          $('#upload-button').click(function() {
+            window.location.href = '/upload.html';
           })
           // if uploader == user signed in
           if (user.uid == uidSeller) {
@@ -147,6 +142,14 @@
           $('#sign').click(function() {
             window.location.href = '/login.html';
           })
+          $('#chat-button').click(function() {
+            alert('Sign In Before Chat!');
+            window.location.href = '/login.html';
+          })
+          $('#upload-button').click(function() {
+            alert('Sign In Before Upload!');
+            window.location.href = '/login.html';
+          })
         }
       })
     })
@@ -161,12 +164,14 @@
     // Click Chat button    
     $('#chat').click(function() {
       var uidBuyer = JSON.parse(localStorage.getItem('user')).uid;
+      var buyerName = JSON.parse(localStorage.getItem('user')).displayName;
       var timestamp = new Date();
       var present = timestamp.toDateString();
       var chatData = {
         participants: [uidBuyer, uidSeller],
         product: productName,
-        date: present
+        date: present,
+        roomName: `${buyerName} - ${sellerName}`
       };
 
       var exist = false;
@@ -179,24 +184,19 @@
             && snapshot.data().participants.includes(uidSeller)) {
             exist = true;
           }
-
-          // if the chatroom already exists,
-          if (exist) {
-            // redirect to chat.html
-            window.location.href = '/chat.html';
-          // if the chatroom doesn't exist.
-          } else {
-            // create the chatroom and redirect to chat.html
-            db.collection('chatroom').add(chatData).then(() => {
-              window.location.href = '/chat.html';
-            });
-          }
         })
+        // if the chatroom already exists,
+        if (exist) {
+          // redirect to chat.html
+          window.location.href = '/chat.html';
+        // if the chatroom doesn't exist.
+        } else {
+          // create the chatroom and redirect to chat.html
+          db.collection('chatroom').add(chatData).then(() => {
+            window.location.href = '/chat.html';
+          });
+        }
       })
-      
-      
-
-      
     })
     
   </script>
